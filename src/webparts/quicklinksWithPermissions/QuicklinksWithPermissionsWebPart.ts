@@ -15,6 +15,7 @@ import SiteServices from "./../services/SiteServices";
 export interface IQuicklinksWithPermissionsWebPartProps {
   collectionData: any[];
   restrictedGroup : string;
+  title: string;
 }
 
 export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebPart<IQuicklinksWithPermissionsWebPartProps> {
@@ -29,6 +30,11 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
       const element: React.ReactElement<IQuicklinksWithPermissionsProps > = React.createElement(
         QuicklinksWithPermissions,
         {
+          title: this.properties.title,
+          fUpdateProperty: (value: string) => {
+            this.properties.title = value;
+          },
+          displayMode : this.displayMode,
           collectionData: this.properties.collectionData? this.properties.collectionData : [],
           userInRestrictedGroup : isInGroup,
           fPropertyPaneOpen: this.context.propertyPane.open
