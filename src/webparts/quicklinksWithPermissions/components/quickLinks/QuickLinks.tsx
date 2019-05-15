@@ -11,19 +11,12 @@ export interface QuickLinksProps {
   userInRestricted : boolean;
 }
 
-export interface QuickLinksState {
-  items?: IQuickLinkItem[];
-}
-
-class QuickLinks extends React.Component<QuickLinksProps, QuickLinksState> {
+class QuickLinks extends React.Component<QuickLinksProps, {}> {
   constructor(props: QuickLinksProps) {
     super(props);
-    this.state = {
-      items: props.items
-    };
   }
   public render(): JSX.Element {
-    let { items = [] } = this.state;
+    let { items = [] } = this.props;
     //filter the restricted if user is not in the restricted group
     if(!this.props.userInRestricted){
       items = items.filter(item =>{

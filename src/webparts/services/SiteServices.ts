@@ -39,7 +39,6 @@ class SiteServices {
       try {
         sp.web.siteGroups.get().then((groups : any[]) =>{
           let groupNames = [];
-          console.log(groups);
           groups.forEach(group =>{
             groupNames.push(group.Title);
           });
