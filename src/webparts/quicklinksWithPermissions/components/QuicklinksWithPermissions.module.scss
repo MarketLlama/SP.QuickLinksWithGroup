@@ -6,11 +6,12 @@
     margin: 0px auto;
 
     .itemCell {
-
+      cursor: pointer;
       min-height: 54px;
       padding: 10px;
       box-sizing: border-box;
-      border-bottom: 1px solid $ms-color-neutralLight;
+      border-bottom: 1px solid;
+      border-color: $ms-color-neutralLighterAlt;
       display: flex;
 
       &:hover {
@@ -26,6 +27,26 @@
       margin-left: 10px;
       overflow: hidden;
       flex-grow: 1;
+    }
+
+    .itemIcon {
+      line-height: 48px;
+      text-align: center;
+      font-size: 26px;
+      width: 48px;
+      height: 48px;
+      -ms-flex: none;
+      flex: none;
+      align-self: center;
+      box-sizing: border-box;
+      position: relative;
+      background-color: $ms-color-neutralLight;
+      i{
+        font-size: 20px;
+      }
+    }& .itemRestricted {
+      background-color: $ms-color-themePrimary !important;
+      color : $ms-color-white !important;
     }
 
     .itemName {

@@ -7,27 +7,33 @@ import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { List } from 'office-ui-fabric-react/lib/List';
 import styles from '../QuicklinksWithPermissions.module.scss';
 import { IQuickLinkItem } from './IQuickLinkItem';
+import { render } from 'react-dom';
 
 export interface QuickLinksProps {
   items: IQuickLinkItem[];
+  userInRestricted : boolean;
 }
 
 export interface QuickLinksState {
-  filterText?: string;
   items?: IQuickLinkItem[];
 }
 
 class QuickLinks extends React.Component<QuickLinksProps, QuickLinksState> {
   constructor(props: QuickLinksProps) {
     super(props);
-
     this.state = {
-      filterText: '',
       items: props.items
     };
   }
   public render(): JSX.Element {
-    const { items = [] } = this.state;
+    let { items = [] } = this.state;
+
+    //filter the restricted if user is not in the restricted group
+    if(!this.props.userInRestricted){
+      items = items.filter(item =>{
+        return (item.isRestricted != true);
+      });
+    }
 
     return (
       <FocusZone direction={FocusZoneDirection.vertical}>
@@ -36,13 +42,13 @@ class QuickLinks extends React.Component<QuickLinksProps, QuickLinksState> {
     );
   }
 
-  private _onRenderCell(item: IQuickLinkItem, index: number | undefined): JSX.Element {
+  private _onRenderCell = (item: IQuickLinkItem): JSX.Element => {
     return (
-      <div className={styles.itemCell} data-is-focusable={true}>
-        <Image className={styles.itemImage} src={item.iconName} width={50} height={50} imageFit={ImageFit.cover} />
+      <div className={styles.itemCell} data-is-focusable={true} onClick={() => window.location.href = item.linkURL}>
+        <Icon iconName={item.iconName}
+          className={styles.itemIcon + ' ' + (item.isRestricted? styles.itemRestricted : '')}/>
         <div className={styles.itemContent}>
           <div className={styles.itemName}>{item.name}</div>
-          <div className={styles.itemIndex}>{`Item ${index}`}</div>
           <div>{item.description}</div>
         </div>
         <Icon className={styles.chevron} iconName={getRTL() ? 'ChevronLeft' : 'ChevronRight'} />

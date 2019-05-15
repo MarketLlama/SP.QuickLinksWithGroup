@@ -10,7 +10,8 @@ export default class QuicklinksWithPermissions extends React.Component<IQuicklin
       <div className={ styles.quicklinksWithPermissions }>
         <div className={ styles.container }>
         {this.props.collectionData && this.props.collectionData.length > 0 ? (
-          <QuickLinks items={this.props.collectionData}/>
+          <QuickLinks items={this.props.collectionData}
+            userInRestricted={this.props.userInRestrictedGroup}/>
         ) : (
           <Placeholder
             iconName='Edit'

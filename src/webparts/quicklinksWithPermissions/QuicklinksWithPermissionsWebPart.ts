@@ -94,9 +94,9 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
               groupFields: [
                 PropertyFieldCollectionData("collectionData", {
                   key: "collectionData",
-                  label: "Collection data",
+                  label: "Edit Links",
                   panelHeader: "Edit links",
-                  manageBtnLabel: "Manage collection data",
+                  manageBtnLabel: "Edit Links",
                   value: this.properties.collectionData,
                   fields: [
                     {
