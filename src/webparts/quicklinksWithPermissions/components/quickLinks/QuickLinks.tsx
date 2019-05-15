@@ -1,13 +1,10 @@
 import * as React from 'react';
 import { getRTL } from 'office-ui-fabric-react/lib/Utilities';
 import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZone';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
-import { Image, ImageFit } from 'office-ui-fabric-react/lib/Image';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { List } from 'office-ui-fabric-react/lib/List';
 import styles from '../QuicklinksWithPermissions.module.scss';
 import { IQuickLinkItem } from './IQuickLinkItem';
-import { render } from 'react-dom';
 
 export interface QuickLinksProps {
   items: IQuickLinkItem[];
@@ -27,7 +24,6 @@ class QuickLinks extends React.Component<QuickLinksProps, QuickLinksState> {
   }
   public render(): JSX.Element {
     let { items = [] } = this.state;
-
     //filter the restricted if user is not in the restricted group
     if(!this.props.userInRestricted){
       items = items.filter(item =>{

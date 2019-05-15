@@ -7,6 +7,7 @@ import {
   PropertyFieldCollectionData,
   CustomCollectionFieldType
 } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
+import { PropertyFieldOrder } from '@pnp/spfx-property-controls/lib/PropertyFieldOrder';
 import * as strings from 'QuicklinksWithPermissionsWebPartStrings';
 import QuicklinksWithPermissions from './components/QuicklinksWithPermissions';
 import { IQuicklinksWithPermissionsProps } from './components/IQuicklinksWithPermissionsProps';
@@ -139,6 +140,18 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
                   label: "Select Restricted Group",
                   options: this.dropdownOptions,
                 }),
+              ]
+            },{
+              groupName: "Order Links",
+              groupFields: [
+                PropertyFieldOrder("orderedItems", {
+                  key: "orderedItems",
+                  label: "Ordered Items",
+                  items: this.properties.collectionData,
+                  textProperty: "name",
+                  properties: this.properties,
+                  onPropertyChange: this.onPropertyPaneFieldChanged
+                })
               ]
             }
           ]
