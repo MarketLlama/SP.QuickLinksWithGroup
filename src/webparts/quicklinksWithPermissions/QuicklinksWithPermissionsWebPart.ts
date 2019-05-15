@@ -1,35 +1,79 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
+import { BaseClientSideWebPart, IWebPartPropertiesMetadata } from '@microsoft/sp-webpart-base';
+import { IPropertyPaneConfiguration, IPropertyPaneDropdownOption, PropertyPaneDropdown } from "@microsoft/sp-property-pane";
 import {
-  IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-property-pane';
-
+  PropertyFieldCollectionData,
+  CustomCollectionFieldType
+} from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 import * as strings from 'QuicklinksWithPermissionsWebPartStrings';
 import QuicklinksWithPermissions from './components/QuicklinksWithPermissions';
 import { IQuicklinksWithPermissionsProps } from './components/IQuicklinksWithPermissionsProps';
+import SiteServices from "./../services/SiteServices";
 
 export interface IQuicklinksWithPermissionsWebPartProps {
-  description: string;
+  collectionData: any[];
+  restrictedGroup : string;
 }
 
 export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebPart<IQuicklinksWithPermissionsWebPartProps> {
 
-  public render(): void {
-    const element: React.ReactElement<IQuicklinksWithPermissionsProps > = React.createElement(
-      QuicklinksWithPermissions,
-      {
-        description: this.properties.description
-      }
-    );
+  private dropdownOptions: IPropertyPaneDropdownOption[] = [];
+  private loadingIndicator: boolean = true;
 
-    ReactDom.render(element, this.domElement);
+  public render(): void {
+    const siteServices = new SiteServices(this.context);
+    const groupName = this.properties.restrictedGroup? this.properties.restrictedGroup : '';
+    siteServices.checkUserInGroup(groupName).then(isInGroup =>{
+      const element: React.ReactElement<IQuicklinksWithPermissionsProps > = React.createElement(
+        QuicklinksWithPermissions,
+        {
+          collectionData: this.properties.collectionData? this.properties.collectionData : [],
+          userInRestrictedGroup : isInGroup,
+          fPropertyPaneOpen: this.context.propertyPane.open
+        }
+      );
+      ReactDom.render(element, this.domElement);
+    });
+  }
+
+  protected onPropertyPaneConfigurationStart(): void {
+    this.getSiteGroups().then((response) => {
+      this.dropdownOptions = response;
+      this.context.propertyPane.refresh();
+      this.loadingIndicator = false;
+    });
+  }
+
+  protected getSiteGroups = () =>{
+    return new Promise<IPropertyPaneDropdownOption[]>(async (resolve, reject) => {
+      try {
+        let options: Array<IPropertyPaneDropdownOption> = new Array<IPropertyPaneDropdownOption>();
+        const siteServices = new SiteServices(this.context);
+        const groups = await siteServices.getSiteGroupNames();
+        for (const group of groups) {
+          options.push({
+            key : group,
+            text : group
+          });
+        }
+        resolve(options);
+      } catch (error) {
+        console.log(error);
+        reject();
+      }
+    });
   }
 
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
+  }
+
+  protected get propertiesMetadata(): IWebPartPropertiesMetadata {
+    return {
+      'collectionData': { isSearchablePlainText: true }
+    };
   }
 
   protected get dataVersion(): Version {
@@ -38,6 +82,7 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
+      showLoadingIndicator: this.loadingIndicator,
       pages: [
         {
           header: {
@@ -47,9 +92,47 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
+                PropertyFieldCollectionData("collectionData", {
+                  key: "collectionData",
+                  label: "Collection data",
+                  panelHeader: "Edit links",
+                  manageBtnLabel: "Manage collection data",
+                  value: this.properties.collectionData,
+                  fields: [
+                    {
+                      id: "name",
+                      title: "Name of the link",
+                      type: CustomCollectionFieldType.string,
+                      required: true
+                    },
+                    {
+                      id: "linkURL",
+                      title: "URL of Link",
+                      type: CustomCollectionFieldType.url,
+                      required: true
+                    },
+                    {
+                      id: "description",
+                      title: "Short description of link",
+                      type: CustomCollectionFieldType.string
+                    },
+                    {
+                      id: "iconName",
+                      title: "Fabric Icon",
+                      type: CustomCollectionFieldType.fabricIcon
+                    },
+                    {
+                      id: "isRestricted",
+                      title: "Is restricted?",
+                      type: CustomCollectionFieldType.boolean,
+                    }
+                  ],
+                  disabled: false
+                }),
+                PropertyPaneDropdown('restrictedGroup', {
+                  label: "Select Restricted Group",
+                  options: this.dropdownOptions,
+                }),
               ]
             }
           ]

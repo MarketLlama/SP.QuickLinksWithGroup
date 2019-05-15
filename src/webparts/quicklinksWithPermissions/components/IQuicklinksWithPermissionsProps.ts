@@ -1,3 +1,7 @@
+import { IQuickLinkItem } from "./quickLinks/IQuickLinkItem";
+
 export interface IQuicklinksWithPermissionsProps {
-  description: string;
+  collectionData: IQuickLinkItem[];
+  userInRestrictedGroup : boolean;
+  fPropertyPaneOpen: () => void;
 }
