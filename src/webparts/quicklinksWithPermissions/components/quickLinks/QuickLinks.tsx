@@ -26,7 +26,7 @@ class QuickLinks extends React.Component<QuickLinksProps, {}> {
 
     return (
       <FocusZone direction={FocusZoneDirection.vertical}>
-        <List items={items} onRenderCell={this._onRenderCell} />
+        {items.map(item => this._onRenderCell(item))}
       </FocusZone>
     );
   }
