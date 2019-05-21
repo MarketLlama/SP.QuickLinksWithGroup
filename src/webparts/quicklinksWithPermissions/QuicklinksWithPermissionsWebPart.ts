@@ -7,6 +7,7 @@ import {
   PropertyFieldCollectionData,
   CustomCollectionFieldType
 } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
+import { PropertyPanePropertyEditor } from '@pnp/spfx-property-controls/lib/PropertyPanePropertyEditor';
 import { PropertyFieldOrder } from '@pnp/spfx-property-controls/lib/PropertyFieldOrder';
 import * as strings from 'QuicklinksWithPermissionsWebPartStrings';
 import QuicklinksWithPermissions from './components/QuicklinksWithPermissions';
@@ -155,6 +156,19 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
               ]
             }
           ]
+        }, {
+          header : {
+            description : 'Web Part Property Configuration'
+          },
+          groups: [{
+            groupName:'Web Part JSON',
+            groupFields: [
+              PropertyPanePropertyEditor({
+                webpart: this,
+                key: 'propertyEditor'
+              })
+            ]
+          }]
         }
       ]
     };
