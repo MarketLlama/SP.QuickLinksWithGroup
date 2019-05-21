@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-quick-links-with-group-client-side-solution",
     "id": "1938c387-6e0c-40d7-9858-9a9cf56aded8",
-    "version": "1.0.0.5",
+    "version": "1.0.0.10",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false
