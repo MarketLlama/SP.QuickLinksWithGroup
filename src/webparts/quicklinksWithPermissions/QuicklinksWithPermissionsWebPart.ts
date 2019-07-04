@@ -13,6 +13,7 @@ import * as strings from 'QuicklinksWithPermissionsWebPartStrings';
 import QuicklinksWithPermissions from './components/QuicklinksWithPermissions';
 import { IQuicklinksWithPermissionsProps } from './components/IQuicklinksWithPermissionsProps';
 import SiteServices from "./../services/SiteServices";
+import { PnPClientStorage } from '@pnp/common';
 
 export interface IQuicklinksWithPermissionsWebPartProps {
   collectionData: any[];
@@ -26,9 +27,11 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
   private loadingIndicator: boolean = true;
 
   public render(): void {
-    const siteServices = new SiteServices(this.context);
-    const groupName = this.properties.restrictedGroup? this.properties.restrictedGroup : '';
-    siteServices.checkUserInGroup(groupName).then(isInGroup =>{
+    const QUICKLINKS_KEY = `syngenta-quicklinks-${this.context.pageContext.web.id}`;
+    const storage = new PnPClientStorage();
+    let isInGroupCache : boolean = storage.session.get(QUICKLINKS_KEY);
+
+    if(isInGroupCache !== null){
       const element: React.ReactElement<IQuicklinksWithPermissionsProps > = React.createElement(
         QuicklinksWithPermissions,
         {
@@ -38,12 +41,34 @@ export default class QuicklinksWithPermissionsWebPart extends BaseClientSideWebP
           },
           displayMode : this.displayMode,
           collectionData: this.properties.collectionData? this.properties.collectionData : [],
-          userInRestrictedGroup : isInGroup,
+          userInRestrictedGroup : isInGroupCache,
           fPropertyPaneOpen: this.context.propertyPane.open
         }
       );
       ReactDom.render(element, this.domElement);
-    });
+    } else {
+      const siteServices = new SiteServices(this.context);
+      const groupName = this.properties.restrictedGroup? this.properties.restrictedGroup : '';
+      siteServices.checkUserInGroup(groupName).then(isInGroup =>{
+
+        storage.session.put(QUICKLINKS_KEY, isInGroup);
+
+        const element: React.ReactElement<IQuicklinksWithPermissionsProps > = React.createElement(
+          QuicklinksWithPermissions,
+          {
+            title: this.properties.title,
+            fUpdateProperty: (value: string) => {
+              this.properties.title = value;
+            },
+            displayMode : this.displayMode,
+            collectionData: this.properties.collectionData? this.properties.collectionData : [],
+            userInRestrictedGroup : isInGroup,
+            fPropertyPaneOpen: this.context.propertyPane.open
+          }
+        );
+        ReactDom.render(element, this.domElement);
+      });
+    }
   }
 
   protected onPropertyPaneConfigurationStart(): void {
